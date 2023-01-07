@@ -1,6 +1,6 @@
 package dev.blackcandletech.parkway
 
-import dev.blackcandletech.parkway.command.CommandManager
+import dev.blackcandletech.parkway.api.command.CommandManager
 import dev.blackcandletech.parkway.data.JSONFile
 import dev.blackcandletech.parkway.data.MongoConnector
 import net.dv8tion.jda.api.JDA

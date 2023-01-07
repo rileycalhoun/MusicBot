@@ -1,10 +1,9 @@
-package dev.blackcandletech.parkway.command.commands.music
+package dev.blackcandletech.parkway.commands.music
 
-import dev.blackcandletech.parkway.command.SlashCommand
+import dev.blackcandletech.parkway.api.command.CommandContext
+import dev.blackcandletech.parkway.api.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import java.net.URI
 import java.net.URISyntaxException
@@ -33,24 +32,14 @@ class PlayCommand: SlashCommand {
         return options
     }
 
-    override fun execute(interaction: SlashCommandInteraction, args: Array<String>) {
-        interaction.deferReply(false).queue()
+    override fun execute(context: CommandContext) {
+        val interaction = context.getInteraction()
+        interaction.deferReply(false)
+            .queue()
+        if(!context.getSelfVoiceState()!!.inAudioChannel())
+            context.joinExecutorAudioChannel(false)
 
-        val guild = interaction.guild!!
-        val member = interaction.member!!
-        val self = interaction.guild!!.selfMember
-        val selfVoiceState = self.voiceState!!
-
-        if(!selfVoiceState.inAudioChannel()) {
-            val joined = GuildManager.getInstance().getMusicManager(guild).joinVoiceChannel(self, member, interaction, force = false, reply = false)
-            if(!joined) {
-                interaction.hook
-                    .editOriginalFormat("There was an error while attempting to connect to the voice channel. Make sure you're in a voice channel that I have permission to access!")
-                    .queue()
-                return
-            }
-        }
-
+        val guild = context.getGuild()!!
         var song = interaction.getOption("song")!!.asString
         if(!isURL(song))
             song = "ytsearch:$song audio"

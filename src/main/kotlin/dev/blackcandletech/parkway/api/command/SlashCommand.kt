@@ -1,8 +1,7 @@
-package dev.blackcandletech.parkway.command
+package dev.blackcandletech.parkway.api.command
 
-import net.dv8tion.jda.api.interactions.commands.Command.Option
-import net.dv8tion.jda.api.interactions.commands.Command.Subcommand
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
+import dev.blackcandletech.parkway.api.audio.ExecutorChannelState
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 
@@ -12,7 +11,7 @@ interface SlashCommand {
     fun getDescription(): String
     fun isRequired(): Boolean
     fun isGuildOnly(): Boolean
-    fun execute(interaction: SlashCommandInteraction, args: Array<String>)
+    fun execute(context: CommandContext)
 
     fun getSubCommands(): MutableCollection<SubcommandData>? {
         return null

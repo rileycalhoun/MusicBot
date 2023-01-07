@@ -1,10 +1,11 @@
-package dev.blackcandletech.parkway.command.commands.music
+package dev.blackcandletech.parkway.commands.music
 
-import dev.blackcandletech.parkway.audio.RepeatingType
-import dev.blackcandletech.parkway.command.SlashCommand
+import dev.blackcandletech.parkway.api.audio.ExecutorChannelState
+import dev.blackcandletech.parkway.api.audio.RepeatingType
+import dev.blackcandletech.parkway.api.command.CommandContext
+import dev.blackcandletech.parkway.api.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 
 class SkipCommand: SlashCommand {
 
@@ -24,7 +25,8 @@ class SkipCommand: SlashCommand {
         return true
     }
 
-    override fun execute(interaction: SlashCommandInteraction, args: Array<String>) {
+    override fun execute(context: CommandContext) {
+        val interaction = context.getInteraction()
         interaction.deferReply(false)
             .queue()
         val guild = interaction.guild!!
@@ -34,10 +36,24 @@ class SkipCommand: SlashCommand {
             return
         }
 
-        val self = guild.selfMember
         val musicManager = GuildManager.getInstance().getMusicManager(guild)
-        if(!musicManager.inSameVoiceChannel(self, member, interaction, true))
+
+        val builder = StringBuilder("")
+        when(context.inSameAudioChannel()) {
+            ExecutorChannelState.NOT_IN_VOICE ->
+            {
+                if (context.getSelfVoiceState()!!.inAudioChannel()) builder.append("There is no music playing currently!")
+                else builder.append("You need to be in the same voice channel as me to use this command!")
+            }
+            ExecutorChannelState.NOT_IN_SAME_VOICE -> builder.append("You need to be in the same voice channel as me to use this command!")
+            else -> builder.append("")
+        }
+
+        if(builder.toString() != "") {
+            interaction.hook.editOriginal(builder.toString())
+                .queue()
             return
+        }
 
         val audioPlayer = musicManager.audioPlayer
         if(audioPlayer.playingTrack == null) {

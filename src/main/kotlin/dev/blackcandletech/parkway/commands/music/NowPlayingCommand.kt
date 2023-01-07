@@ -1,8 +1,8 @@
-package dev.blackcandletech.parkway.command.commands.music
+package dev.blackcandletech.parkway.commands.music
 
-import dev.blackcandletech.parkway.command.SlashCommand
+import dev.blackcandletech.parkway.api.command.CommandContext
+import dev.blackcandletech.parkway.api.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 
 class NowPlayingCommand: SlashCommand {
     override fun getName(): String {
@@ -21,15 +21,12 @@ class NowPlayingCommand: SlashCommand {
         return true
     }
 
-    override fun execute(interaction: SlashCommandInteraction, args: Array<String>) {
+    override fun execute(context: CommandContext) {
+        val interaction = context.getInteraction()
         interaction.deferReply(false)
             .queue()
-        val guild = interaction.guild!!
-        val member = interaction.member!!
-        val self = guild.selfMember
+        val guild = context.getGuild()!!
         val musicManager = GuildManager.getInstance().getMusicManager(guild)
-        if(!musicManager.inSameVoiceChannel(self, member, interaction, true))
-            return
 
         val audioPlayer = musicManager.audioPlayer
         if(audioPlayer.playingTrack == null) {

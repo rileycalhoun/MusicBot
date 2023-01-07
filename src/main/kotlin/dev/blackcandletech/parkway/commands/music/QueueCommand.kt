@@ -1,10 +1,9 @@
-package dev.blackcandletech.parkway.command.commands.music
+package dev.blackcandletech.parkway.commands.music
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import dev.blackcandletech.parkway.command.SlashCommand
+import dev.blackcandletech.parkway.api.command.CommandContext
+import dev.blackcandletech.parkway.api.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 
 class QueueCommand: SlashCommand {
 
@@ -24,11 +23,11 @@ class QueueCommand: SlashCommand {
         return true
     }
 
-    override fun execute(interaction: SlashCommandInteraction, args: Array<String>) {
+    override fun execute(context: CommandContext) {
+        val interaction = context.getInteraction()
         interaction.deferReply(false)
             .queue()
-
-        val guild = interaction.guild!!
+        val guild = context.getGuild()!!
         val musicManager = GuildManager.getInstance().getMusicManager(guild)
         val queue = musicManager.scheduler.queue
 

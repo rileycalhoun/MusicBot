@@ -1,6 +1,6 @@
 package dev.blackcandletech.parkway.data.struct
 
-import dev.blackcandletech.parkway.command.SlashCommand
+import dev.blackcandletech.parkway.api.command.SlashCommand
 
 data class GuildData(
     val name: String,

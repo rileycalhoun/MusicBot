@@ -3,11 +3,9 @@ package dev.blackcandletech.parkway.guild
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
-import dev.blackcandletech.parkway.Parkway
-import dev.blackcandletech.parkway.audio.GuildMusicManager
+import dev.blackcandletech.parkway.api.audio.GuildMusicManager
 import dev.blackcandletech.parkway.data.struct.GuildData
 import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 
 class GuildManager {
 

@@ -1,13 +1,13 @@
-package dev.blackcandletech.parkway.command.commands.music
+package dev.blackcandletech.parkway.commands.music
 
-import dev.blackcandletech.parkway.audio.RepeatingType
-import dev.blackcandletech.parkway.command.SlashCommand
+import dev.blackcandletech.parkway.api.audio.RepeatingType
+import dev.blackcandletech.parkway.api.command.CommandContext
+import dev.blackcandletech.parkway.api.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 class RepeatCommand: SlashCommand, ListenerAdapter() {
@@ -36,21 +36,19 @@ class RepeatCommand: SlashCommand, ListenerAdapter() {
         return options
     }
 
-    override fun execute(interaction: SlashCommandInteraction, args: Array<String>) {
+    override fun execute(context: CommandContext) {
+        val interaction = context.getInteraction()
         interaction.deferReply(false)
             .queue()
-        val guild = interaction.guild!!
-        val member = interaction.member!!
+        val guild = context.getGuild()!!
+        val member = context.getExecutorAsMember()!!
+        val self = context.getSelfMember()!!
         if(!member.hasPermission(Permission.VOICE_MUTE_OTHERS)) {
             interaction.hook.editOriginal("You need the **`VOICE_MUTE_OTHERS`** permission in order to use this command!\nNote: We will be adding a DJ role soon.")
             return
         }
 
-        val self = guild.selfMember
         val musicManager = GuildManager.getInstance().getMusicManager(guild)
-        if(!musicManager.inSameVoiceChannel(self, member, interaction, true))
-            return
-
         val typeOption = interaction.getOption("type")
         if(typeOption == null) {
             val repeating = musicManager.scheduler.repeat

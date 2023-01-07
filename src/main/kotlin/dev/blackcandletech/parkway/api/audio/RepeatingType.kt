@@ -1,4 +1,4 @@
-package dev.blackcandletech.parkway.audio
+package dev.blackcandletech.parkway.api.audio
 
 enum class RepeatingType {
 

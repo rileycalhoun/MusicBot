@@ -1,4 +1,4 @@
-package dev.blackcandletech.parkway.audio
+package dev.blackcandletech.parkway.api.audio
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame

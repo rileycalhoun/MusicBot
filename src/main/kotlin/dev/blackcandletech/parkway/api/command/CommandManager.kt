@@ -1,4 +1,4 @@
-package dev.blackcandletech.parkway.command
+package dev.blackcandletech.parkway.api.command
 
 import dev.blackcandletech.parkway.Parkway
 import net.dv8tion.jda.api.JDA
@@ -24,11 +24,12 @@ class CommandManager(val jda: JDA) {
         val args = commandString.copyOfRange(1, commandString.size)
 
         val command = commands.find { it.getName() == commandName.lowercase() } ?: return
-        command.execute(interaction, args)
+        val context = CommandContext(interaction, args)
+        command.execute(context)
     }
 
     private fun findCommands () {
-        val clazzes = Reflections("dev.blackcandletech.parkway.command.commands")
+        val clazzes = Reflections("dev.blackcandletech.parkway.commands")
             .getSubTypesOf(SlashCommand::class.java)
 
         for (clazz in clazzes) {
