@@ -1,6 +1,5 @@
 package dev.blackcandletech.parkway.commands.music
 
-import dev.blackcandletech.parkway.api.audio.ExecutorChannelState
 import dev.blackcandletech.parkway.api.command.CommandContext
 import dev.blackcandletech.parkway.api.command.SlashCommand
 import net.dv8tion.jda.api.Permission
@@ -43,18 +42,8 @@ class JoinCommand: SlashCommand {
             .queue()
         val member = context.getExecutorAsMember()!!
         val force = (interaction.getOption("force")?.asBoolean == true) && (member.hasPermission(Permission.VOICE_MOVE_OTHERS))
-        val state = context.joinExecutorAudioChannel(force)
-
-        val message = StringBuilder()
-        when(state) {
-            ExecutorChannelState.SUCCESS -> message.append("Connecting to **`\uD83D\uDD0A %s`**!", context.getSelfVoiceState()!!.channel!!.name)
-            ExecutorChannelState.NO_PERMISSION -> message.append("I don't have permission to join %s!", context.getExecutorVoiceState()!!.channel!!.name)
-            ExecutorChannelState.NOT_IN_VOICE -> message.append("You're not currently in a voice channel!")
-            ExecutorChannelState.NOT_IN_SAME_VOICE -> message.append("I'm already in a voice channel!")
-            ExecutorChannelState.IN_SAME_VOICE -> message.append("We're already in the same voice channel!")
-        }
-
-        interaction.hook.editOriginal(message.toString())
+        val response = context.joinExecutorAudioChannel(force)
+        interaction.hook.editOriginal(response)
             .queue()
         return
     }

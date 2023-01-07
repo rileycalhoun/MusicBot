@@ -1,13 +1,10 @@
 package dev.blackcandletech.parkway.api.command
 
-import dev.blackcandletech.parkway.api.audio.ExecutorChannelState
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.entities.channel.Channel
-import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 
@@ -85,31 +82,31 @@ data class CommandContext(private val interaction: SlashCommandInteraction, priv
     /**
      * @apiNote Guild only
      */
-    fun joinExecutorAudioChannel (force: Boolean): ExecutorChannelState {
+    fun joinExecutorAudioChannel (force: Boolean): String {
         if(getExecutorVoiceState()!!.inAudioChannel())
-            return ExecutorChannelState.NOT_IN_VOICE
+            return "You are not in a voice channel!"
         if(getSelfVoiceState()!!.inAudioChannel() && !force)
-            return ExecutorChannelState.NOT_IN_SAME_VOICE
+            return "I'm already in a voice channel!"
 
         val audioManager = getGuild()!!.audioManager
         val channel = getExecutorVoiceState()!!.channel!!
 
         if(!selfHasPermission(channel, Permission.VOICE_CONNECT))
-            return ExecutorChannelState.NO_PERMISSION
+            return String.format("I don't have permission to join %s!", getSelfVoiceState()!!.channel!!.name)
 
         audioManager.openAudioConnection(channel)
-        return ExecutorChannelState.SUCCESS
+        return String.format("Connecting to **`\uD83D\uDD0A %s`**!", getSelfVoiceState()!!.channel!!.name)
     }
 
-    fun inSameAudioChannel (): ExecutorChannelState {
+    fun inSameAudioChannel (): String? {
         if(getSelfVoiceState()!!.inAudioChannel())
-            return ExecutorChannelState.NOT_IN_VOICE
+            return "I need to be in a voice channel!"
         if(getExecutorVoiceState()!!.inAudioChannel())
-            return ExecutorChannelState.NOT_IN_VOICE
+            return "You're not in a voice channel!"
         if(getExecutorVoiceState()!!.channel != getSelfVoiceState()!!.channel)
-            return ExecutorChannelState.NOT_IN_SAME_VOICE
+            return "You need to be in thes same voice channel as me!"
 
-        return ExecutorChannelState.IN_SAME_VOICE
+        return null
     }
 
     override fun equals(other: Any?): Boolean {

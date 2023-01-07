@@ -1,7 +1,5 @@
 package dev.blackcandletech.parkway.api.command
 
-import dev.blackcandletech.parkway.api.audio.ExecutorChannelState
-import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 

@@ -1,6 +1,5 @@
 package dev.blackcandletech.parkway.commands.music
 
-import dev.blackcandletech.parkway.api.audio.ExecutorChannelState
 import dev.blackcandletech.parkway.api.command.CommandContext
 import dev.blackcandletech.parkway.api.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
@@ -35,19 +34,9 @@ class StopCommand: SlashCommand {
             return
         }
 
-        val builder = StringBuilder("")
-        when(context.inSameAudioChannel()) {
-            ExecutorChannelState.NOT_IN_VOICE ->
-            {
-                if (context.getSelfVoiceState()!!.inAudioChannel()) builder.append("There is no music playing currently!")
-                else builder.append("You need to be in the same voice channel as me to use this command!")
-            }
-            ExecutorChannelState.NOT_IN_SAME_VOICE -> builder.append("You need to be in the same voice channel as me to use this command!")
-            else -> builder.append("")
-        }
-
-        if(builder.toString() != "") {
-            interaction.hook.editOriginal(builder.toString())
+        val response = context.inSameAudioChannel()
+        if(response != null) {
+            interaction.hook.editOriginal(response)
                 .queue()
             return
         }
