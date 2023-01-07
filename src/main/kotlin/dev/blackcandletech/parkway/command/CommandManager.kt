@@ -5,11 +5,8 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
-import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import net.dv8tion.jda.internal.interactions.CommandDataImpl
-import org.litote.kreflect.findProperty
 import org.reflections.Reflections
-import java.util.*
 
 class CommandManager(val jda: JDA) {
 
@@ -53,7 +50,8 @@ class CommandManager(val jda: JDA) {
                 else if(command.getOptions() != null) {
                     var autoComplete = false
                     for(option in command.getOptions()!!) {
-                        if(option.isAutoComplete && (option.javaClass.isInstance(ListenerAdapter::class.java)))
+                        val instanceOfAutocomplete = command is ListenerAdapter
+                        if(option.isAutoComplete && (instanceOfAutocomplete))
                             autoComplete = true
                         data.addOptions(option)
                     }

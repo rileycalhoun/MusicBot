@@ -3,9 +3,6 @@ package dev.blackcandletech.parkway
 import dev.blackcandletech.parkway.command.CommandManager
 import dev.blackcandletech.parkway.data.JSONFile
 import dev.blackcandletech.parkway.data.MongoConnector
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -14,10 +11,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.reflections.Reflections
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileOutputStream
-import java.io.FileReader
 import java.lang.Exception
 import java.util.EnumSet
 
@@ -62,10 +55,13 @@ class Parkway(token: String) {
                 token,
                 GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGES,
-                GatewayIntent.GUILD_VOICE_STATES
+                GatewayIntent.GUILD_VOICE_STATES,
             ).disableCache(EnumSet.of(
                 CacheFlag.CLIENT_STATUS,
-                CacheFlag.ACTIVITY
+                CacheFlag.ACTIVITY,
+                CacheFlag.EMOJI,
+                CacheFlag.STICKER,
+                CacheFlag.SCHEDULED_EVENTS
             )).enableCache(CacheFlag.VOICE_STATE)
     }
 

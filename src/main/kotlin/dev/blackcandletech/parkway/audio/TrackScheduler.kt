@@ -4,14 +4,13 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
-import dev.blackcandletech.parkway.Parkway
-import net.dv8tion.jda.api.managers.AudioManager
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
 class TrackScheduler(val player: AudioPlayer): AudioEventAdapter() {
 
     val queue: BlockingQueue<AudioTrack> = LinkedBlockingQueue()
+    var repeat: RepeatingType = RepeatingType.NONE
 
     fun queue (track: AudioTrack) {
         if (!this.player.startTrack(track, true)) {
@@ -23,9 +22,17 @@ class TrackScheduler(val player: AudioPlayer): AudioEventAdapter() {
         this.player.startTrack(this.queue.poll(), false)
     }
 
-    override fun onTrackEnd(player: AudioPlayer, track: AudioTrack?, endReason: AudioTrackEndReason) {
-        if (endReason.mayStartNext)
+    override fun onTrackEnd(player: AudioPlayer, track: AudioTrack, endReason: AudioTrackEndReason) {
+        if (endReason.mayStartNext) {
+            if(this.repeat == RepeatingType.SINGLE) {
+                this.player.startTrack(track.makeClone(), false)
+                return
+            }
+
             nextTrack()
+            if(this.repeat == RepeatingType.QUEUE)
+                queue(track.makeClone())
+        }
     }
 
     fun clearQueue() {

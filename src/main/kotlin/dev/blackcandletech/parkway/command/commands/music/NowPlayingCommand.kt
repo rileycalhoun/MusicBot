@@ -2,7 +2,6 @@ package dev.blackcandletech.parkway.command.commands.music
 
 import dev.blackcandletech.parkway.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
-import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 
 class NowPlayingCommand: SlashCommand {
@@ -27,11 +26,6 @@ class NowPlayingCommand: SlashCommand {
             .queue()
         val guild = interaction.guild!!
         val member = interaction.member!!
-        if(!member.hasPermission(Permission.VOICE_MUTE_OTHERS)) {
-            interaction.hook.editOriginal("You need the **`VOICE_MUTE_OTHERS`** permission in order to use this command!\nNote: We will be adding a DJ role soon.")
-            return
-        }
-
         val self = guild.selfMember
         val selfVoicestate = self.voiceState!!
 

@@ -1,6 +1,5 @@
 package dev.blackcandletech.parkway.data
 
-import dev.blackcandletech.parkway.Parkway
 import kotlinx.serialization.json.*
 import java.io.BufferedReader
 import java.io.File
@@ -20,7 +19,7 @@ class JSONFile(private val fileName: String, private val copyFromResources: Bool
 
     private fun createFile () {
         // Create a blank config file and create an output stream
-        file.createNewFile();
+        file.createNewFile()
         if(copyFromResources) {
             val fileStream = FileOutputStream(file)
 
@@ -54,6 +53,18 @@ class JSONFile(private val fileName: String, private val copyFromResources: Bool
 
     fun getString(key: String): String {
         return getValue(key)!!.jsonPrimitive.content
+    }
+
+    fun getDouble(key: String): Double {
+        return getValue(key)!!.jsonPrimitive.double
+    }
+
+    fun getFloat(key: String): Float {
+        return getValue(key)!!.jsonPrimitive.float
+    }
+
+    fun getBoolean(key: String): Boolean {
+        return getValue(key)!!.jsonPrimitive.boolean
     }
 
 

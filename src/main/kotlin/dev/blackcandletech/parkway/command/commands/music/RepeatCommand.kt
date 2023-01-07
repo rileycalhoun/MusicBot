@@ -4,16 +4,22 @@ import dev.blackcandletech.parkway.audio.RepeatingType
 import dev.blackcandletech.parkway.command.SlashCommand
 import dev.blackcandletech.parkway.guild.GuildManager
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
+import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
-class SkipCommand: SlashCommand {
+class RepeatCommand: SlashCommand, ListenerAdapter() {
+
+    private val words = arrayOf("Single", "Queue", "None")
 
     override fun getName(): String {
-        return "skip"
+        return "repeat"
     }
 
     override fun getDescription(): String {
-        return "Skip the currently playing song!"
+        return "Repeat the current song or queue!"
     }
 
     override fun isRequired(): Boolean {
@@ -22,6 +28,12 @@ class SkipCommand: SlashCommand {
 
     override fun isGuildOnly(): Boolean {
         return true
+    }
+
+    override fun getOptions(): MutableCollection<OptionData> {
+        val options = mutableListOf<OptionData>()
+        options.add(OptionData(OptionType.STRING, "type", "Single or Queue (none: toggle single/off)", false, true))
+        return options
     }
 
     override fun execute(interaction: SlashCommandInteraction, args: Array<String>) {
@@ -58,27 +70,30 @@ class SkipCommand: SlashCommand {
         }
 
         val musicManager = GuildManager.getInstance().getMusicManager(guild)
-        val audioPlayer = musicManager.audioPlayer
-        if(audioPlayer.playingTrack == null) {
-            interaction.hook.editOriginal("There is no music playing currently!")
-            return
-        }
+        val typeOption = interaction.getOption("type")
+        if(typeOption == null) {
+            val repeating = musicManager.scheduler.repeat
+            if(repeating == RepeatingType.SINGLE || repeating == RepeatingType.QUEUE)
+                musicManager.scheduler.repeat = RepeatingType.NONE
+            else
+                musicManager.scheduler.repeat = RepeatingType.SINGLE
+        } else
+            musicManager.scheduler.repeat = RepeatingType.valueOf(typeOption.asString.uppercase())
 
-        /*
-        * Might get enabled later (possibly through Guild Settings)
-        */
-//        if(musicManager.scheduler.repeat == RepeatingType.SINGLE) {
-//            interaction.hook.editOriginal("The track scheduler is set to repeat this song!")
-//                .queue()
-//            return
-//        }
-
-        val track = musicManager.audioPlayer.playingTrack.makeClone()
-        interaction.hook.editOriginal("Skipping **`${track.info.title}`** by **`${track.info.author}`**!")
+        val repeating = musicManager.scheduler.repeat
+        val repeatingType = if (repeating == RepeatingType.NONE) {
+            "no repeat"
+        } else "repeat ${repeating.name.lowercase()}"
+        interaction.hook.editOriginalFormat("The player has been set to **%s**!", repeatingType)
             .queue()
-        musicManager.scheduler.nextTrack()
-        if(musicManager.scheduler.repeat == RepeatingType.QUEUE)
-            musicManager.scheduler.queue(track)
+    }
+
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+        if(event.name == "repeat" && event.focusedOption.name == "type") {
+            event.replyChoiceStrings(words.filter {
+                it.startsWith(event.focusedOption.value)
+            }).queue()
+        }
     }
 
 }
