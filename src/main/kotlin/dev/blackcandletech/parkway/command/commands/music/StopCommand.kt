@@ -34,29 +34,10 @@ class StopCommand: SlashCommand {
         }
 
         val self = guild.selfMember
-        val selfVoicestate = self.voiceState!!
-
-        if(!selfVoicestate.inAudioChannel()) {
-            interaction.hook.editOriginal("I'm not currently in a voice channel!")
-                .queue()
-            return
-        }
-
-        val memberVoiceState = member.voiceState!!
-
-        if(!memberVoiceState.inAudioChannel()) {
-            interaction.hook.editOriginal("You need to be in the same voice channel as me in order to use this command!")
-                .queue()
-            return
-        }
-
-        if(memberVoiceState.channel != selfVoicestate.channel) {
-            interaction.hook.editOriginal("You need to be in the same voice channel as me in order to use this command!")
-                .queue()
-            return
-        }
-
         val musicManager = GuildManager.getInstance().getMusicManager(guild)
+        if(!musicManager.inSameVoiceChannel(self, member, interaction, true))
+            return
+
         musicManager.scheduler.player.stopTrack()
         musicManager.scheduler.clearQueue()
         guild.audioManager.closeAudioConnection()

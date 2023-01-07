@@ -36,9 +36,10 @@ class JoinCommand: SlashCommand {
         interaction.deferReply(true)
             .queue()
         val guild = interaction.guild!!
+        val self = guild.selfMember
         val member = interaction.member!!
         val force = (interaction.getOption("force")?.asBoolean == true) && (member.hasPermission(Permission.VOICE_MOVE_OTHERS))
-        GuildManager.getInstance().getMusicManager(guild).joinVoiceChannel(interaction, force, true)
+        GuildManager.getInstance().getMusicManager(guild).joinVoiceChannel(self, member, interaction, force, true)
         return
     }
 

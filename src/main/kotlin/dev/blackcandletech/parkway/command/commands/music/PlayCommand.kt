@@ -37,11 +37,12 @@ class PlayCommand: SlashCommand {
         interaction.deferReply(false).queue()
 
         val guild = interaction.guild!!
+        val member = interaction.member!!
         val self = interaction.guild!!.selfMember
         val selfVoiceState = self.voiceState!!
 
         if(!selfVoiceState.inAudioChannel()) {
-            val joined = GuildManager.getInstance().getMusicManager(guild).joinVoiceChannel(interaction, force = false, reply = false)
+            val joined = GuildManager.getInstance().getMusicManager(guild).joinVoiceChannel(self, member, interaction, force = false, reply = false)
             if(!joined) {
                 interaction.hook
                     .editOriginalFormat("There was an error while attempting to connect to the voice channel. Make sure you're in a voice channel that I have permission to access!")

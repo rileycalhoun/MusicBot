@@ -7,6 +7,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.interactions.Interaction
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 
 class GuildMusicManager(private val audioPlayerManager: AudioPlayerManager) {
@@ -23,10 +25,8 @@ class GuildMusicManager(private val audioPlayerManager: AudioPlayerManager) {
         return sendHandler
     }
 
-    fun joinVoiceChannel(interaction: SlashCommandInteraction, force: Boolean, reply: Boolean): Boolean {
-        val member = interaction.member!!
+    fun joinVoiceChannel(self: Member, member: Member, interaction: SlashCommandInteraction, force: Boolean, reply: Boolean): Boolean {
         val guild = interaction.guild!!
-        val self = guild.selfMember
 
         if(self.voiceState!!.inAudioChannel() && !force) {
             if(reply) interaction.hook.editOriginal("I'm already in a voice channel!")
@@ -51,6 +51,33 @@ class GuildMusicManager(private val audioPlayerManager: AudioPlayerManager) {
         audioManager.openAudioConnection(voiceChannel)
         if(reply) interaction.hook.editOriginalFormat("Connecting to **`\uD83D\uDD0A %s`**!", voiceChannel.name)
             .queue()
+        return true
+    }
+
+    fun inSameVoiceChannel(self: Member, member: Member, interaction: SlashCommandInteraction, replyIfNot: Boolean): Boolean {
+        val selfVoiceState = self.voiceState!!
+        if(!selfVoiceState.inAudioChannel()) {
+            if(replyIfNot) interaction
+                .hook.editOriginal("I'm not currently in a voice channel!")
+                .queue()
+            return false
+        }
+
+        val memberVoiceState = member.voiceState!!
+        if(!memberVoiceState.inAudioChannel()) {
+            if(replyIfNot) interaction
+                .hook.editOriginal("You need to be in the same voice channel as me!")
+                .queue()
+            return false
+        }
+
+        if(memberVoiceState.channel != selfVoiceState.channel) {
+            if(replyIfNot) interaction
+                .hook.editOriginal("You need to be in the same voice channel as me!")
+                .queue()
+            return false
+        }
+
         return true
     }
 
