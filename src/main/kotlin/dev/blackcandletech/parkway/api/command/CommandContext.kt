@@ -136,4 +136,8 @@ data class CommandContext(private val interaction: SlashCommandInteraction, priv
         return result
     }
 
+    override fun toString(): String {
+        return interaction.fullCommandName
+    }
+
 }
